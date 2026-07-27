@@ -7,6 +7,7 @@ import CustomScrollbar from "@/CustomScrollbar";
 import GridOverlay from "@/GridOverlay";
 import Header from "@/layout/Header/Header";
 import Footer from "@/layout/Header/footer/footer";
+import { WishlistProvider } from "@/sections/cart.tsx/cart";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -34,14 +35,16 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-     <html lang="en" dir="ltr" className={`${playfairDisplay.variable} ${inter.variable}`}>
+    <html lang="en" dir="ltr" className={`${playfairDisplay.variable} ${inter.variable}`}>
       <body className="font-[family-name:var(--font-inter)]">
         <TRPCReactProvider>
-          <Header />
-          <SmoothScroll>
-            {children}
-          </SmoothScroll>
-          <Footer />
+          <WishlistProvider>
+            <Header />
+            <SmoothScroll>
+              {children}
+            </SmoothScroll>
+            <Footer />
+          </WishlistProvider>
         </TRPCReactProvider>
         <CustomScrollbar />
         <GridOverlay />
