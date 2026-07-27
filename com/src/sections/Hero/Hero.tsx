@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import Image from "next/image";
 import Container from "@/Container";
@@ -8,17 +8,25 @@ export default function Hero() {
   const { labelRef, titleRef, subRef, btn1Ref, btn2Ref, scrollRef } = useHeroAnimation();
 
   return (
-    <section className="relative w-full h-screen overflow-hidden">
+    <section className="relative w-full h-screen overflow-hidden bg-white">
 
-      <Image
-        src="/imgehero/hero.png"
-        alt="Hero"
-        fill
-        priority
-        className="object-cover object-[75%_top]"
-      />
-
-      <div className="absolute inset-0 bg-black/30" />
+      {/* Wrapper يجمع الصورة والـ overlay سوا عشان يختفوا مع بعض بنفس الفيد */}
+       <div
+  className="absolute inset-0"
+  style={{
+    maskImage: "linear-gradient(to bottom, black 0%, black 82%, transparent 100%)",
+    WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 82%, transparent 100%)",
+  }}
+>
+        <Image
+          src="/imgehero/hero.png"
+          alt="Hero"
+          fill
+          priority
+          className="object-cover object-[75%_top]"
+        />
+        <div className="absolute inset-0 bg-black/30" />
+      </div>
 
       <Container className="relative z-10 h-full flex items-center">
         <div className="max-w-[500px] flex flex-col gap-4 sm:gap-6">
@@ -69,15 +77,15 @@ export default function Hero() {
       </Container>
 
       <div
-        ref={scrollRef}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
-        style={{ willChange: "transform, opacity" }}
-      >
-        <span className="font-[family-name:var(--font-inter)] text-label-sm text-white/50 tracking-[0.2em] uppercase">Scroll</span>
-        <div className="w-[1px] h-10 bg-white/30 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-full bg-white/80 animate-bounce" />
-        </div>
-      </div>
+  ref={scrollRef}
+  className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10"
+  style={{ willChange: "transform, opacity" }}
+>
+  <span className="font-[family-name:var(--font-inter)] text-label-sm text-black/60 tracking-[0.2em] uppercase">Scroll</span>
+  <div className="w-[1px] h-10 bg-black/25 relative overflow-hidden">
+    <div className="absolute top-0 left-0 w-full h-full bg-black/70 animate-bounce" />
+  </div>
+</div>
 
     </section>
   );

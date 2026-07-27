@@ -113,31 +113,33 @@ const categories: Category[] = ["MEN", "WOMEN", "ACCESSORIES", "SHOES", "SALE"];
 // ─── Heart Button ─────────────────────────────────────────────────────────────
 
 function HeartButton({ product }: { product: Product }) {
-  const { add, remove, has } = useWishlist();
+  const { add, remove } = useWishlist();
   const [burst, setBurst] = useState(false);
-  const liked = has(product.id);
+  const [showRed, setShowRed] = useState(false);
 
   const toggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (liked) {
-      remove(product.id);
-    } else {
-      setBurst(true);
-      setTimeout(() => setBurst(false), 500);
-      add({
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        originalPrice: product.originalPrice,
-        image: product.image,
-      });
-    }
+
+    setBurst(true);
+    setShowRed(true);
+    add({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice,
+      image: product.image,
+    });
+
+    // البورست يرجع لحجمه الطبيعي بسرعة
+    setTimeout(() => setBurst(false), 350);
+    // اللون الأحمر يفضل شوية وبعدين يختفي (يرجع outline)
+    setTimeout(() => setShowRed(false), 900);
   };
 
   return (
     <button
       onClick={toggle}
-      aria-label={liked ? "Remove from wishlist" : "Add to wishlist"}
+      aria-label="Add to wishlist"
       className="
         absolute bottom-3 right-3 z-10
         w-9 h-9 rounded-full
@@ -153,14 +155,14 @@ function HeartButton({ product }: { product: Product }) {
         width="18"
         height="18"
         viewBox="0 0 24 24"
-        fill={liked ? "#E8192C" : "none"}
-        stroke={liked ? "#E8192C" : "#111111"}
+        fill={showRed ? "#E8192C" : "none"}
+        stroke={showRed ? "#E8192C" : "#111111"}
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
         style={{
           transform: burst ? "scale(1.45)" : "scale(1)",
-          transition: "transform 0.35s cubic-bezier(0.34,1.56,0.64,1), fill 0.2s ease, stroke 0.2s ease",
+          transition: "transform 0.35s cubic-bezier(0.34,1.56,0.64,1), fill 0.4s ease, stroke 0.4s ease",
         }}
       >
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
