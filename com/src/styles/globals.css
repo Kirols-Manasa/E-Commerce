@@ -22,3 +22,14 @@ html, body {
   0% { opacity: 1; transform: translateY(0); }
   100% { opacity: 0; transform: translateY(14px); }
 }
+
+
+
+@keyframes zoom-in-fade {
+  0%   { opacity: 0; transform: scale(2); }
+  30%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.animate-zoom-in-fade {
+  animation: zoom-in-fade 1.2s ease forwards;
+}

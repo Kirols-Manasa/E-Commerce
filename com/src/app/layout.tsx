@@ -7,7 +7,7 @@ import CustomScrollbar from "@/CustomScrollbar";
 import GridOverlay from "@/GridOverlay";
 import Header from "@/layout/Header/Header";
 import Footer from "@/layout/Header/footer/footer";
-import { WishlistProvider } from "@/sections/cart.tsx/cart";
+import { WishlistProvider, CartProvider } from "@/sections/cart.tsx/cart";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -39,11 +39,13 @@ export default function RootLayout({
       <body className="font-[family-name:var(--font-inter)]">
         <TRPCReactProvider>
           <WishlistProvider>
-            <Header />
-            <SmoothScroll>
-              {children}
-            </SmoothScroll>
-            <Footer />
+            <CartProvider>
+              <Header />
+              <SmoothScroll>
+                {children}
+              </SmoothScroll>
+              <Footer />
+            </CartProvider>
           </WishlistProvider>
         </TRPCReactProvider>
         <CustomScrollbar />
