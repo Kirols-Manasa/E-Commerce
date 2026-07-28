@@ -1,6 +1,7 @@
  "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import Container from "@/Container";
 import { useState, useContext, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
@@ -178,9 +179,12 @@ function CartSidebar({ open, onClose }: { open: boolean; onClose: () => void }) 
               ${items.reduce((s, i) => s + i.price * i.qty, 0).toLocaleString()}
             </span>
           </div>
-          <button className="w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer">
+          <Link
+            href="/checkout"
+            className="block w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer text-center"
+          >
             Checkout
-          </button>
+          </Link>
         </div>
       )}
     </div>

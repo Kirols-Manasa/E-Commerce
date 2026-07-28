@@ -1,11 +1,34 @@
-"use client";
+ "use client";
 
 import Image from "next/image";
 import Container from "@/Container";
 import { useHeroAnimation } from "./Animation";
+import { useRouter } from "next/navigation";
 
 export default function Hero() {
   const { labelRef, titleRef, subRef, btn1Ref, btn2Ref, scrollRef } = useHeroAnimation();
+  const router = useRouter();
+
+  function handleShopNow() {
+    router.push("/product/men-1");
+  }
+
+  function handleSale() {
+    window.dispatchEvent(new CustomEvent("set-category", { detail: "SALE" }));
+    setTimeout(() => {
+      const target = document.getElementById("shop");
+      if (!target) return;
+      const lenis = (window as unknown as Record<string, any>).lenis;
+      const headerHeight = document.querySelector("header")?.getBoundingClientRect().height ?? 88;
+      const offset = -(headerHeight + 24);
+      if (lenis && typeof lenis.scrollTo === "function") {
+        lenis.scrollTo(target, { offset, duration: 1.2 });
+      } else {
+        const top = target.getBoundingClientRect().top + window.scrollY + offset;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }, 50);
+  }
 
   return (
     <section className="relative w-full h-screen overflow-hidden bg-white">
@@ -59,6 +82,7 @@ export default function Hero() {
           <div className="flex items-center gap-4 mt-2">
             <button
               ref={btn1Ref}
+              onClick={handleShopNow}
               className="font-[family-name:var(--font-inter)] text-body-md bg-white text-black px-8 py-3 rounded-full hover:bg-white/90 transition-all duration-300 cursor-pointer"
               style={{ willChange: "transform, opacity" }}
             >
@@ -66,6 +90,7 @@ export default function Hero() {
             </button>
             <button
               ref={btn2Ref}
+              onClick={handleSale}
               className="font-[family-name:var(--font-inter)] text-body-md text-white border border-white/50 px-8 py-3 rounded-full hover:border-white transition-all duration-300 cursor-pointer"
               style={{ willChange: "transform, opacity" }}
             >

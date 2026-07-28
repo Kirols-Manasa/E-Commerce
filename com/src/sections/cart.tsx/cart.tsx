@@ -28,7 +28,21 @@ interface WishlistCtx {
 export const WishlistContext = createContext<WishlistCtx | null>(null);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<WishlistItem[]>([]);
+  // ① لما الصفحة تفتح: اقرأ من localStorage (لو فيه بيانات محفوظة)
+  const [items, setItems] = useState<WishlistItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("wishlist");
+      return saved ? (JSON.parse(saved) as WishlistItem[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // ② كل ما الـ items تتغير: احفظهم في localStorage
+  useEffect(() => {
+    localStorage.setItem("wishlist", JSON.stringify(items));
+  }, [items]);
 
   const add = useCallback((item: WishlistItem) => {
     setItems((prev) => (prev.some((i) => i.id === item.id) ? prev : [item, ...prev]));
@@ -75,7 +89,21 @@ interface CartCtx {
 export const CartContext = createContext<CartCtx | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  // ① لما الصفحة تفتح: اقرأ من localStorage
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const saved = localStorage.getItem("cart");
+      return saved ? (JSON.parse(saved) as CartItem[]) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // ② كل ما الـ items تتغير: احفظهم في localStorage
+  useEffect(() => {
+    localStorage.setItem("cart", JSON.stringify(items));
+  }, [items]);
 
   const add = useCallback((item: Omit<CartItem, "qty">) => {
     setItems((prev) => {
@@ -228,38 +256,29 @@ export default function ShopSection() {
   const [activeCategory, setActiveCategory] = useState<Category>(initialCategory);
   const filtered = products.filter((p) => p.category === activeCategory);
 
-  // ── لما نيجي من "View All →" بـ ?category=، نظبط التاب الصح ونعمل سكرول
-  // دقيق للسكشن نفسه (offset = ارتفاع الهيدر الفعلي، مش رقم ثابت مخمّن) ──
+  // استمع لـ event من زرار الـ Sale في الـ Hero
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const cat = (e as CustomEvent).detail as Category;
+      if (cat) setActiveCategory(cat);
+    };
+    window.addEventListener("set-category", handler);
+    return () => window.removeEventListener("set-category", handler);
+  }, []);
+
+  // ── لما نيجي من "View All →" بـ ?category=، نظبط التاب بس من غير scroll تلقائي
   useEffect(() => {
     const cat = searchParams.get("category")?.toUpperCase() as Category | null;
     if (cat && categories.includes(cat)) {
       setActiveCategory(cat);
-
-      // فريمين عشان نضمن إن الجريد اتحدّث بالكامل (تغيير التاب بيغيّر ارتفاع الصفحة)
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const lenis = (window as unknown as Record<string, any>).lenis;
-          const target = sectionRef.current;
-          if (!target) return;
-
-          const headerEl = document.querySelector("header");
-          const headerHeight = headerEl?.getBoundingClientRect().height ?? 88;
-          const offset = -(headerHeight + 24);
-
-          if (lenis && typeof lenis.scrollTo === "function") {
-            lenis.scrollTo(target, { offset, duration: 1.1 });
-          } else {
-            const top = target.getBoundingClientRect().top + window.scrollY + offset;
-            window.scrollTo({ top, behavior: "smooth" });
-          }
-        });
-      });
+      // امسح الـ ?category من الـ URL عشان الـ reload ميعملش scroll
+      window.history.replaceState({}, "", "/");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   return (
-    <section ref={sectionRef} className="w-full py-16 sm:py-20 lg:py-24 bg-white">
+    <section id="shop" ref={sectionRef} className="w-full py-16 sm:py-20 lg:py-24 bg-white">
       <Container>
 
         <div className="mb-10 sm:mb-12">

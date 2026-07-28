@@ -1,4 +1,4 @@
-  "use client";
+ "use client";
 
 import { useEffect } from "react";
 import Lenis from "lenis";
@@ -18,6 +18,10 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     });
 
     (window as unknown as Record<string, unknown>).lenis = lenis;
+
+    // ارجع لفوق دايماً لما الصفحة تتحمل
+    window.scrollTo({ top: 0 });
+    lenis.scrollTo(0, { immediate: true });
 
     // مزامنة لينيس مع GSAP ScrollTrigger عشان الأنيميشن يحصل في اللحظة الصح
     lenis.on("scroll", ScrollTrigger.update);
