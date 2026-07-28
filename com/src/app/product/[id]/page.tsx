@@ -182,7 +182,7 @@ export default function ProductPage() {
                 ))}
               </div>
 
-              <ZoomImage src={gallery[activeImage]} alt={product.name} fit={product.fit} />
+               <ZoomImage src={gallery[activeImage] ?? product.image} alt={product.name} fit={product.fit} />
             </div>
 
             {/* ─── Info ────────────────────────────────── */}
@@ -226,7 +226,7 @@ export default function ProductPage() {
               {product.colors && (
                 <div className="mt-8">
                   <span className="font-[family-name:var(--font-inter)] text-[11px] text-black/40 tracking-[0.2em] uppercase">
-                    Color <span className="text-black/70 normal-case tracking-normal">— {product.colors[selectedColor].name}</span>
+                     Color <span className="text-black/70 normal-case tracking-normal">— {product.colors?.[selectedColor]?.name}</span>
                   </span>
                   <div className="flex gap-2.5 mt-4">
                     {product.colors.map((c, i) => (
