@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Container from "@/Container";
 import { useState, useContext, useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useHeader } from "./HeaderAnimation";
 import { WishlistContext, CartContext, type WishlistItem, type CartItem } from "@/sections/cart.tsx/cart";
 
@@ -12,13 +12,31 @@ import { WishlistContext, CartContext, type WishlistItem, type CartItem } from "
 
 function WishlistSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ctx = useContext(WishlistContext);
+  const cartCtx = useContext(CartContext);
+  const router = useRouter();
   const items: WishlistItem[] = ctx?.items ?? [];
   const remove = ctx?.remove ?? (() => {});
+
+  const moveToBag = () => {
+    if (!cartCtx || !ctx) return;
+    items.forEach((item) => {
+      cartCtx.add({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        originalPrice: item.originalPrice,
+        image: item.image,
+      });
+      ctx.remove(item.id);
+    });
+    onClose();
+    router.push("/checkout");
+  };
 
   return (
     <div className={`
       fixed top-0 right-0 h-full z-50
-      w-[24vw] min-w-[280px] max-w-[340px]
+      w-full sm:w-[24vw] sm:min-w-[280px] sm:max-w-[340px]
       bg-white/65 backdrop-blur-md shadow-xl
       flex flex-col
       transform transition-transform duration-300
@@ -93,7 +111,10 @@ function WishlistSidebar({ open, onClose }: { open: boolean; onClose: () => void
               ${items.reduce((s, i) => s + i.price, 0).toLocaleString()}
             </span>
           </div>
-          <button className="w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer">
+          <button
+            onClick={moveToBag}
+            className="w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer"
+          >
             Move to Bag
           </button>
         </div>
@@ -106,13 +127,14 @@ function WishlistSidebar({ open, onClose }: { open: boolean; onClose: () => void
 
 function CartSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ctx = useContext(CartContext);
+    const router = useRouter(); // ← أضف
   const items: CartItem[] = ctx?.items ?? [];
   const remove = ctx?.remove ?? (() => {});
 
   return (
     <div className={`
       fixed top-0 right-0 h-full z-50
-      w-[24vw] min-w-[280px] max-w-[340px]
+      w-full sm:w-[24vw] sm:min-w-[280px] sm:max-w-[340px]
       bg-white/65 backdrop-blur-md shadow-xl
       flex flex-col
       transform transition-transform duration-300
@@ -179,12 +201,12 @@ function CartSidebar({ open, onClose }: { open: boolean; onClose: () => void }) 
               ${items.reduce((s, i) => s + i.price * i.qty, 0).toLocaleString()}
             </span>
           </div>
-          <Link
-            href="/checkout"
-            className="block w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer text-center"
-          >
-            Checkout
-          </Link>
+           <button
+  onClick={() => { onClose(); router.push("/checkout"); }}
+  className="block w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer text-center"
+>
+  Checkout
+</button>
         </div>
       )}
     </div>

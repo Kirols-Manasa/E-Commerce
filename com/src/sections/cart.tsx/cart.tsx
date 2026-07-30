@@ -28,7 +28,6 @@ interface WishlistCtx {
 export const WishlistContext = createContext<WishlistCtx | null>(null);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
-  // ① لما الصفحة تفتح: اقرأ من localStorage (لو فيه بيانات محفوظة)
   const [items, setItems] = useState<WishlistItem[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -39,7 +38,6 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  // ② كل ما الـ items تتغير: احفظهم في localStorage
   useEffect(() => {
     localStorage.setItem("wishlist", JSON.stringify(items));
   }, [items]);
@@ -67,7 +65,7 @@ export function useWishlist() {
   return ctx;
 }
 
-// ─── Cart Context (جديد) ──────────────────────────────────────────────────────
+// ─── Cart Context ─────────────────────────────────────────────────────────────
 
 export interface CartItem {
   id: string;
@@ -89,7 +87,6 @@ interface CartCtx {
 export const CartContext = createContext<CartCtx | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  // ① لما الصفحة تفتح: اقرأ من localStorage
   const [items, setItems] = useState<CartItem[]>(() => {
     if (typeof window === "undefined") return [];
     try {
@@ -100,7 +97,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  // ② كل ما الـ items تتغير: احفظهم في localStorage
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(items));
   }, [items]);
@@ -134,7 +130,7 @@ export function useCart() {
   return ctx;
 }
 
-// ─── Heart Button — دلوقتي بيرجع طبيعي لما تدوس تاني (toggle حقيقي) ───────────
+// ─── Heart Button ─────────────────────────────────────────────────────────────
 
 function HeartButton({ product }: { product: Product }) {
   const { add, remove, has } = useWishlist();
@@ -158,7 +154,6 @@ function HeartButton({ product }: { product: Product }) {
       });
     }
 
-    // نبضة بصرية بس (تحمر لحظة ثم ترجع طبيعي تلقائيًا) — مش state ثابت
     setBurst(true);
     setFlashRed(true);
     setTimeout(() => setBurst(false), 350);
@@ -266,13 +261,27 @@ export default function ShopSection() {
     return () => window.removeEventListener("set-category", handler);
   }, []);
 
-  // ── لما نيجي من "View All →" بـ ?category=، نظبط التاب بس من غير scroll تلقائي
+  // لما نيجي من "View All →" بـ ?category=
   useEffect(() => {
     const cat = searchParams.get("category")?.toUpperCase() as Category | null;
     if (cat && categories.includes(cat)) {
       setActiveCategory(cat);
-      // امسح الـ ?category من الـ URL عشان الـ reload ميعملش scroll
       window.history.replaceState({}, "", "/");
+
+      // scroll للـ shop section لو جاي من صفحة product
+      if (sessionStorage.getItem("scrollToShop")) {
+        sessionStorage.removeItem("scrollToShop");
+        setTimeout(() => {
+          const el = document.getElementById("shop");
+          if (!el) return;
+          const lenis = (window as any).lenis;
+          if (lenis?.scrollTo) {
+            lenis.scrollTo(el, { offset: -80, duration: 1.2 });
+          } else {
+            el.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 100);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);

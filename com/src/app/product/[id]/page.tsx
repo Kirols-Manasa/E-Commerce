@@ -146,7 +146,7 @@ export default function ProductPage() {
 
   return (
     <>
-      {/* ─── Continue Shopping — fixed جنب الهيدر ─── */}
+      {/* ─── Continue Shopping ─── */}
       <Link
         href="/"
         className="group relative z-10 inline-flex items-center gap-2.5 mb-6 text-[12px] tracking-[0.15em] uppercase text-black/45 hover:text-black transition-colors font-[family-name:var(--font-inter)]"
@@ -159,9 +159,9 @@ export default function ProductPage() {
       </Link>
 
       <section ref={pageRef} className="w-full bg-white">
-       <Container className="pt-24 sm:pt-28 pb-24 sm:pb-32">
+        <Container className="pt-24 sm:pt-28 pb-24 sm:pb-32">
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-14 lg:gap-20">
-            {/* ─── Gallery ─────────────────────────────── */}
+            {/* ─── Gallery ─── */}
             <div className="flex gap-4 sm:gap-5">
               <div className="flex flex-col gap-3 shrink-0">
                 {gallery.map((img, i) => (
@@ -182,10 +182,10 @@ export default function ProductPage() {
                 ))}
               </div>
 
-               <ZoomImage src={gallery[activeImage] ?? product.image} alt={product.name} fit={product.fit} />
+              <ZoomImage src={gallery[activeImage] ?? product.image} alt={product.name} fit={product.fit} />
             </div>
 
-            {/* ─── Info ────────────────────────────────── */}
+            {/* ─── Info ─── */}
             <div className="max-w-md lg:pt-4">
               <span className="font-[family-name:var(--font-inter)] text-[11px] text-black/35 tracking-[0.25em] uppercase">
                 {categoryLabel[product.category]} Collection
@@ -226,7 +226,7 @@ export default function ProductPage() {
               {product.colors && (
                 <div className="mt-8">
                   <span className="font-[family-name:var(--font-inter)] text-[11px] text-black/40 tracking-[0.2em] uppercase">
-                     Color <span className="text-black/70 normal-case tracking-normal">— {product.colors?.[selectedColor]?.name}</span>
+                    Color <span className="text-black/70 normal-case tracking-normal">— {product.colors?.[selectedColor]?.name}</span>
                   </span>
                   <div className="flex gap-2.5 mt-4">
                     {product.colors.map((c, i) => (
@@ -326,8 +326,11 @@ export default function ProductPage() {
                   <h2 className="font-[family-name:var(--font-playfair)] text-[26px] sm:text-[32px] text-black">
                     {categoryLabel[cat]}
                   </h2>
+                  {/* ← التعديل هنا: onClick بيحط flag في sessionStorage */}
                   <Link
                     href={`/?category=${cat}`}
+                    scroll={false}
+                    onClick={() => sessionStorage.setItem("scrollToShop", "1")}
                     className="text-[11px] tracking-[0.15em] uppercase text-black/40 hover:text-black transition-colors font-[family-name:var(--font-inter)]"
                   >
                     View All →
