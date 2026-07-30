@@ -1,4 +1,4 @@
- // src/data/products.ts
+// src/data/products.ts
 export type Category = "MEN" | "WOMEN" | "ACCESSORIES" | "SHOES" | "SALE";
 
 export interface Product {
@@ -37,7 +37,7 @@ export const products: Product[] = [
     images: ["/man/image2.webp","/man/additional/man2/image.webp","/man/additional/man2/image copy.webp","/man/additional/man2/image copy 2.webp"],
     category: "MEN", fit: "cover", sizes: DEFAULT_SIZES, colors: DEFAULT_COLORS, description: DEFAULT_DESC, rating: 4.6, reviewCount: 18 },
 
-  { id: "men-3", name: "Pleated Wide Trouser", price: 420, image: "/man/image3.G",
+  { id: "men-3", name: "Pleated Wide Trouser", price: 420, image: "/man/image3.webp",
     images: ["/man/image3.webp","/man/additional/man3/image.webp","/man/additional/man3/image copy.webp","/man/additional/man3/image copy 2.webp"],
     category: "MEN", fit: "cover", sizes: DEFAULT_SIZES, colors: DEFAULT_COLORS, description: DEFAULT_DESC, rating: 4.9, reviewCount: 67 },
 
@@ -95,26 +95,26 @@ export const products: Product[] = [
     category: "WOMEN", fit: "cover", sizes: DEFAULT_SIZES, colors: DEFAULT_COLORS, description: DEFAULT_DESC, rating: 4.5, reviewCount: 9 },
 
   // ── ACCESSORIES ──
-{ id: "acc-1", name: "Chain Waist Belt", price: 95, image: "/Accessories/image1.webp",
-  images: ["/Accessories/image1.webp", "/Accessories/additional/1Accessories/image.webp"],
-  category: "ACCESSORIES", fit: "cover", description: DEFAULT_DESC, rating: 4.6, reviewCount: 55 },
-{ id: "acc-2", name: "Canvas Tote Bag", price: 140, image: "/Accessories/image2.webp",
-  images: ["/Accessories/image2.webp", "/Accessories/additional/2Accessories/image.webp"],
-  category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.8, reviewCount: 31 },
-{ id: "acc-3", name: "Silk Floral Hair Bow", price: 55, image: "/Accessories/image3.webp",
-  images: ["/Accessories/image3.webp", "/Accessories/additional/3Accessories/image.webp"],
-  category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.5, reviewCount: 8 },
-{ id: "acc-4", name: "Signature Sport Socks", price: 35, image: "/Accessories/image4.webp",
-  images: ["/Accessories/image4.webp", "/Accessories/additional/4Accessories/image.webp"],
-  category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.9, reviewCount: 46 },
-{ id: "acc-5", name: "Butterfly Layer Necklace", price: 120, image: "/Accessories/image5.webp",
-  images: ["/Accessories/image5.webp", "/Accessories/additional/5Accessories/image.webp"],
-  category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.7, reviewCount: 22 },
-{ id: "acc-6", name: "Gold Body Chain", price: 185, image: "/Accessories/image6.webp",
-  images: ["/Accessories/image6.webp", "/Accessories/additional/6Accessories/image.webp"],
-  category: "ACCESSORIES", fit: "cover", description: DEFAULT_DESC, rating: 4.6, reviewCount: 63 },
+  { id: "acc-1", name: "Chain Waist Belt", price: 95, image: "/Accessories/image1.webp",
+    images: ["/Accessories/image1.webp", "/Accessories/additional/1Accessories/image.webp"],
+    category: "ACCESSORIES", fit: "cover", description: DEFAULT_DESC, rating: 4.6, reviewCount: 55 },
+  { id: "acc-2", name: "Canvas Tote Bag", price: 140, image: "/Accessories/image2.webp",
+    images: ["/Accessories/image2.webp", "/Accessories/additional/2Accessories/image.webp"],
+    category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.8, reviewCount: 31 },
+  { id: "acc-3", name: "Silk Floral Hair Bow", price: 55, image: "/Accessories/image3.webp",
+    images: ["/Accessories/image3.webp", "/Accessories/additional/3Accessories/image.webp"],
+    category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.5, reviewCount: 8 },
+  { id: "acc-4", name: "Signature Sport Socks", price: 35, image: "/Accessories/image4.webp",
+    images: ["/Accessories/image4.webp", "/Accessories/additional/4Accessories/image.webp"],
+    category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.9, reviewCount: 46 },
+  { id: "acc-5", name: "Butterfly Layer Necklace", price: 120, image: "/Accessories/image5.webp",
+    images: ["/Accessories/image5.webp", "/Accessories/additional/5Accessories/image.webp"],
+    category: "ACCESSORIES", fit: "contain", description: DEFAULT_DESC, rating: 4.7, reviewCount: 22 },
+  { id: "acc-6", name: "Gold Body Chain", price: 185, image: "/Accessories/image6.webp",
+    images: ["/Accessories/image6.webp", "/Accessories/additional/6Accessories/image.webp"],
+    category: "ACCESSORIES", fit: "cover", description: DEFAULT_DESC, rating: 4.6, reviewCount: 63 },
 
-  // ── SHOES ── (صورة إضافية واحدة لكل واحد)
+  // ── SHOES ──
   { id: "shoe-1", name: "Chunky Trail Runner", price: 320, image: "/SHOES/image1.webp",
     images: ["/SHOES/image1.webp","/SHOES/additional/SHOES1/image.webp"], category: "SHOES", fit: "contain", sizes: ["38","39","40","41","42","43","44"], description: DEFAULT_DESC, rating: 4.8, reviewCount: 17 },
   { id: "shoe-2", name: "Classic Court Sneaker", price: 280, image: "/SHOES/image2.webp",
@@ -128,7 +128,7 @@ export const products: Product[] = [
   { id: "shoe-6", name: "Flame Edition Sneaker", price: 310, image: "/SHOES/image6.webp",
     images: ["/SHOES/image6.webp","/SHOES/additional/SHOES6/image.webp"], category: "SHOES", fit: "contain", sizes: ["38","39","40","41","42","43","44"], description: DEFAULT_DESC, rating: 4.8, reviewCount: 21 },
 
-  // ── SALE ── (صورة إضافية واحدة لكل واحد)
+  // ── SALE ──
   { id: "sale-1", name: "Cropped Tank Top", price: 55, originalPrice: 95, image: "/SALE/image1.webp",
     images: ["/SALE/image1.webp","/SALE/additional/SALE1/image.webp"], category: "SALE", fit: "cover", sizes: DEFAULT_SIZES, description: DEFAULT_DESC, rating: 4.5, reviewCount: 47 },
   { id: "sale-2", name: "Washed Cotton Tee", price: 58, originalPrice: 110, image: "/SALE/image2.webp",

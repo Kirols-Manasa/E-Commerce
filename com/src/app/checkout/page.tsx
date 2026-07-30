@@ -762,7 +762,7 @@ export default function CheckoutPage() {
         <div
           ref={borderRef}
           className="border-b border-black/8 mb-10 mt-8"
-          style={{ transformOrigin: "left center", scaleX: 0 }}
+         style={{ transformOrigin: "left center", transform: "scaleX(0)" }}
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-10 xl:gap-16 items-start">
