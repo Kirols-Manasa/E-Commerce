@@ -42,7 +42,7 @@ export default function Hero() {
   }}
 >
         <Image
-          src="/imgehero/hero.png"
+          src="/imgehero/hero.webp"
           alt="Hero"
           fill
           priority
