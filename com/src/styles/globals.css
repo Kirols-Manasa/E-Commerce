@@ -33,3 +33,58 @@ html, body {
 .animate-zoom-in-fade {
   animation: zoom-in-fade 1.2s ease forwards;
 }
+
+/* ─── Float Up label ──────────────────────────────────────────────────────── */
+@keyframes floatUp {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(0px); }
+  20%  { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+  80%  { opacity: 1; transform: translateX(-50%) translateY(-12px); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-18px); }
+}
+
+/* ─── Heart Particles ─────────────────────────────────────────────────────── */
+@keyframes heartParticle1 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(-14px, -14px) scale(0); }
+}
+@keyframes heartParticle2 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(14px, -14px) scale(0); }
+}
+@keyframes heartParticle3 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(-16px, 8px) scale(0); }
+}
+@keyframes heartParticle4 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(16px, 8px) scale(0); }
+}
+@keyframes heartParticle5 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(0px, -18px) scale(0); }
+}
+
+/* ─── Bag Particles ───────────────────────────────────────────────────────── */
+@keyframes bagParticle1 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(-12px, -16px) scale(0); }
+}
+@keyframes bagParticle2 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(12px, -16px) scale(0); }
+}
+@keyframes bagParticle3 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(-14px, 10px) scale(0); }
+}
+@keyframes bagParticle4 {
+  0%   { opacity: 1; transform: translate(-50%, -50%) translate(0px, 0px) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translate(14px, 10px) scale(0); }
+}
+
+/* ─── Breadcrumb active glow ──────────────────────────────────────────────── */
+@keyframes breadcrumbGlow {
+  0%   { box-shadow: 0 0 0 0 rgba(0,0,0,0.15); }
+  50%  { box-shadow: 0 0 0 4px rgba(0,0,0,0.08); }
+  100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); }
+}

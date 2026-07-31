@@ -2,13 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useParams } from "next/navigation";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Container from "@/Container";
 import { products, categories, type Category } from "@/data/products";
 import { useWishlist, useCart, ProductCard } from "@/sections/cart.tsx/cart";
+import { triggerShowHeader } from "@/layout/Header/HeaderAnimation";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -83,12 +84,13 @@ function ZoomImage({ src, alt, fit, imgRef }: {
   fit?: "cover" | "contain";
   imgRef?: React.RefObject<HTMLImageElement | null>;
 }) {
-  const containerRef  = useRef<HTMLDivElement>(null);
-  const internalRef   = useRef<HTMLImageElement>(null);
-  const resolvedRef   = (imgRef ?? internalRef) as React.RefObject<HTMLImageElement>;
-  const [hovering, setHovering] = useState(false);
-  const [pos, setPos]           = useState({ x: 50, y: 50 });
-  const [canZoom, setCanZoom]   = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const internalRef  = useRef<HTMLImageElement>(null);
+  const resolvedRef  = (imgRef ?? internalRef) as React.RefObject<HTMLImageElement>;
+  const hoveringRef  = useRef(false);
+  const posRef       = useRef({ x: 50, y: 50 });
+  const exitPosRef   = useRef({ x: 50, y: 50 });
+  const [canZoom, setCanZoom] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(pointer: fine)");
@@ -98,26 +100,100 @@ function ZoomImage({ src, alt, fit, imgRef }: {
     return () => mq.removeEventListener("change", h);
   }, []);
 
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!canZoom) return;
+  const getRelativePos = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     const r = containerRef.current?.getBoundingClientRect();
-    if (!r) return;
-    setPos({ x: ((e.clientX - r.left) / r.width) * 100, y: ((e.clientY - r.top) / r.height) * 100 });
-  };
+    if (!r) return { x: 50, y: 50 };
+    return {
+      x: ((e.clientX - r.left) / r.width)  * 100,
+      y: ((e.clientY - r.top)  / r.height) * 100,
+    };
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!canZoom || !hoveringRef.current) return;
+    const pos = getRelativePos(e);
+    posRef.current = pos;
+    const img = resolvedRef.current;
+    if (img) {
+      img.style.transformOrigin = `${pos.x}% ${pos.y}%`;
+    }
+  }, [canZoom, resolvedRef, getRelativePos]);
+
+  const handlePointerEnter = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!canZoom) return;
+    const pos = getRelativePos(e);
+    posRef.current = pos;
+    hoveringRef.current = true;
+    const img = resolvedRef.current;
+    if (!img) return;
+    // ابدأ الزوم من نقطة الدخول فوراً
+    img.style.transition = "transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)";
+    img.style.transformOrigin = `${pos.x}% ${pos.y}%`;
+    img.style.transform = "scale(1.4)";
+  }, [canZoom, resolvedRef, getRelativePos]);
+
+  const handlePointerLeave = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!hoveringRef.current) return;
+    hoveringRef.current = false;
+    const pos = getRelativePos(e);
+    exitPosRef.current = pos;
+    const img = resolvedRef.current;
+    if (!img) return;
+    // اخرج من نفس نقطة الخروج
+    img.style.transition = "transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)";
+    img.style.transformOrigin = `${pos.x}% ${pos.y}%`;
+    img.style.transform = "scale(1)";
+  }, [resolvedRef, getRelativePos]);
 
   return (
-    <div ref={containerRef} onMouseMove={handleMove}
-      onMouseEnter={() => canZoom && setHovering(true)}
-      onMouseLeave={() => canZoom && setHovering(false)}
-      className={`relative flex-1 aspect-[4/5] bg-[#F7F6F4] overflow-hidden ${canZoom ? "cursor-zoom-in" : ""}`}>
-      <Image ref={resolvedRef} src={src} alt={alt} fill sizes="55vw" priority
+    <div
+      ref={containerRef}
+      onPointerMove={handlePointerMove}
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      className={`relative flex-1 aspect-[4/5] bg-[#F7F6F4] overflow-hidden ${canZoom ? "cursor-crosshair" : ""}`}
+    >
+      <Image
+        ref={resolvedRef}
+        src={src} alt={alt} fill sizes="55vw" priority
         className={fit === "contain" ? "object-contain p-6 sm:p-10" : "object-cover"}
         style={{
-          transformOrigin: `${pos.x}% ${pos.y}%`,
-          transform: canZoom && hovering ? "scale(1.6)" : "scale(1)",
-          transition: "transform 0.7s cubic-bezier(0.16,1,0.3,1)",
-        }} />
+          transformOrigin: "50% 50%",
+          transform: "scale(1)",
+          transition: "transform 0.38s cubic-bezier(0.22, 1, 0.36, 1)",
+          willChange: "transform",
+        }}
+      />
     </div>
+  );
+}
+
+// ─── Back Button ─────────────────────────────────────────────────────────────
+
+function BackButton() {
+  return (
+    <Link
+      href="/"
+      className="
+        group inline-flex items-center gap-2
+        font-[family-name:var(--font-inter)]
+        text-[11px] tracking-[0.15em] uppercase
+        text-black/40 hover:text-black
+        transition-colors duration-200
+        mb-8
+      "
+    >
+      <svg
+        width="14" height="14" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor"
+        strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+        className="transition-transform duration-200 group-hover:-translate-x-1"
+      >
+        <line x1="19" y1="12" x2="5" y2="12" />
+        <polyline points="12 19 5 12 12 5" />
+      </svg>
+      Back to Shop
+    </Link>
   );
 }
 
@@ -134,7 +210,6 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState(0);
 
   // refs
-  const continueShoppingRef = useRef<HTMLAnchorElement>(null);
   const mainImageWrapRef    = useRef<HTMLDivElement>(null);
   const mainImgElRef        = useRef<HTMLImageElement>(null);
   const thumbsRef           = useRef<HTMLDivElement>(null);
@@ -157,17 +232,7 @@ export default function ProductPage() {
 
     const E = "power3.out";
 
-    // ── L1: Continue Shopping ─────────────────────────────────────────────
-    const cs    = continueShoppingRef.current;
-    const csArrow = cs?.querySelector("svg");
-    if (cs) {
-      gsap.set(cs, { opacity: 0, x: -14 });
-      if (csArrow) gsap.set(csArrow, { x: -6, opacity: 0 });
-      gsap.to(cs, { opacity: 1, x: 0, duration: 0.55, delay: 0, ease: E });
-      if (csArrow) gsap.to(csArrow, { x: 0, opacity: 1, duration: 0.35, delay: 0.3, ease: E });
-    }
-
-    // ── L2: Main Image — clipPath curtain (transform only) ────────────────
+    // ── L2: Main Image ────────────────────────────────────────────────────
     const wrap = mainImageWrapRef.current;
     const img  = mainImgElRef.current;
     if (wrap) {
@@ -177,7 +242,7 @@ export default function ProductPage() {
       if (img) gsap.to(img, { scale: 1, duration: 1.0, delay: 0.1, ease: E });
     }
 
-    // ── L3: Thumbnails — scaleY from bottom ──────────────────────────────
+    // ── L3: Thumbnails ────────────────────────────────────────────────────
     const thumbWrap = thumbsRef.current;
     if (thumbWrap) {
       const thumbs = Array.from(thumbWrap.querySelectorAll("button"));
@@ -359,14 +424,24 @@ export default function ProductPage() {
   };
 
   const handleAddToCart = () => {
-    addToCart({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice, image: product.image });
+    addToCart({
+      id: product.id, name: product.name,
+      price: product.price, originalPrice: product.originalPrice,
+      image: product.image,
+    });
     if (cartBtnRef.current) animateCartBurst(cartBtnRef.current);
+    triggerShowHeader();
   };
 
   const handleWishlist = () => {
-    addToWishlist({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice, image: product.image });
+    addToWishlist({
+      id: product.id, name: product.name,
+      price: product.price, originalPrice: product.originalPrice,
+      image: product.image,
+    });
     const heart = wishlistBtnRef.current?.querySelector("svg");
     if (heart) animateWishlistToggle(heart as SVGElement, !inWishlist);
+    triggerShowHeader();
   };
 
   const handleThumbnailClick = (index: number) => {
@@ -377,38 +452,59 @@ export default function ProductPage() {
 
   return (
     <>
-      {/* Continue Shopping */}
-      <Link ref={continueShoppingRef} href="/"
-        className="group relative z-10 inline-flex items-center gap-2.5 mb-6 text-[12px] tracking-[0.15em] uppercase text-black/45 hover:text-black transition-colors font-[family-name:var(--font-inter)]"
-        style={{ opacity: 0 }}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-          strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
-          className="transition-transform group-hover:-translate-x-1">
-          <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
-        </svg>
-        Continue Shopping
-      </Link>
-
       <section className="w-full bg-white">
         <Container className="pt-24 sm:pt-28 pb-24 sm:pb-32">
+
+          {/* ── زرار الرجوع ── */}
+          <BackButton />
+
           <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] gap-14 lg:gap-20">
 
             {/* Gallery */}
             <div className="flex gap-4 sm:gap-5">
+
+              {/* Thumbnails — غامقة افتراضياً، تتفتح عند الـ hover أو لو active */}
               <div ref={thumbsRef} className="flex flex-col gap-3 shrink-0">
                 {gallery.map((img, i) => (
-                  <button key={img} onClick={() => handleThumbnailClick(i)}
-                    className={`relative w-14 h-[70px] sm:w-[68px] sm:h-[85px] overflow-hidden bg-[#F7F6F4] transition-opacity ${
-                      activeImage === i ? "opacity-100 ring-1 ring-black" : "opacity-50 hover:opacity-80"
-                    }`} style={{ opacity: 0 }}>
-                    <Image src={img} alt={`${product.name} ${i + 1}`} fill
-                      className={product.fit === "contain" ? "object-contain p-1.5" : "object-cover"} />
+                  <button
+                    key={img}
+                    onClick={() => handleThumbnailClick(i)}
+                    className="relative w-14 h-[70px] sm:w-[68px] sm:h-[85px] overflow-hidden bg-[#F7F6F4] transition-all duration-300"
+                    style={{
+                      opacity: 0,
+                      filter: activeImage === i ? "brightness(1)" : "brightness(0.)",
+                      outline: activeImage === i ? "1px solid #111" : "none",
+                      outlineOffset: "0px",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (activeImage !== i) {
+                        (e.currentTarget as HTMLElement).style.filter = "brightness(1)";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (activeImage !== i) {
+                     
+                      }
+                    }}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${product.name} ${i + 1}`}
+                      fill
+                      className={product.fit === "contain" ? "object-contain p-1.5" : "object-cover"}
+                    />
                   </button>
                 ))}
               </div>
 
+              {/* Main Image */}
               <div ref={mainImageWrapRef} className="relative flex-1" style={{ clipPath: "inset(0 0 100% 0)" }}>
-                <ZoomImage src={gallery[activeImage] ?? product.image} alt={product.name} fit={product.fit} imgRef={mainImgElRef} />
+                <ZoomImage
+                  src={gallery[activeImage] ?? product.image}
+                  alt={product.name}
+                  fit={product.fit}
+                  imgRef={mainImgElRef}
+                />
               </div>
             </div>
 
@@ -576,6 +672,7 @@ export default function ProductPage() {
               );
             })}
           </div>
+
         </Container>
       </section>
     </>

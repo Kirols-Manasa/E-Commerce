@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Container from "@/Container";
+import gsap from "gsap";
 import { useState, useContext, useEffect, useRef } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useHeader } from "./HeaderAnimation";
@@ -127,7 +128,7 @@ function WishlistSidebar({ open, onClose }: { open: boolean; onClose: () => void
 
 function CartSidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const ctx = useContext(CartContext);
-    const router = useRouter(); // ← أضف
+  const router = useRouter();
   const items: CartItem[] = ctx?.items ?? [];
   const remove = ctx?.remove ?? (() => {});
 
@@ -201,12 +202,12 @@ function CartSidebar({ open, onClose }: { open: boolean; onClose: () => void }) 
               ${items.reduce((s, i) => s + i.price * i.qty, 0).toLocaleString()}
             </span>
           </div>
-           <button
-  onClick={() => { onClose(); router.push("/checkout"); }}
-  className="block w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer text-center"
->
-  Checkout
-</button>
+          <button
+            onClick={() => { onClose(); router.push("/checkout"); }}
+            className="block w-full bg-black text-white font-[family-name:var(--font-inter)] text-[11px] tracking-[0.15em] uppercase py-4 hover:bg-black/80 transition-colors cursor-pointer text-center"
+          >
+            Checkout
+          </button>
         </div>
       )}
     </div>
@@ -226,13 +227,28 @@ function HeaderHeart({
   count: number;
   onClick: () => void;
 }) {
-  const [show, setShow] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const [particles, setParticles] = useState<number[]>([]);
   const prevCount = useRef(count);
+  const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
     if (count > prevCount.current) {
-      setShow(true);
-      const t = setTimeout(() => setShow(false), 1200);
+      setJustAdded(true);
+      setParticles([1, 2, 3, 4, 5]);
+
+      if (svgRef.current) {
+        gsap.timeline()
+          .to(svgRef.current, { scale: 1.6, duration: 0.15, ease: "power2.out" })
+          .to(svgRef.current, { scale: 0.85, duration: 0.12, ease: "power2.in" })
+          .to(svgRef.current, { scale: 1.2, duration: 0.15, ease: "power3.out" })
+          .to(svgRef.current, { scale: 1, duration: 0.2, ease: "power2.out" });
+      }
+
+      const t = setTimeout(() => {
+        setJustAdded(false);
+        setParticles([]);
+      }, 900);
       prevCount.current = count;
       return () => clearTimeout(t);
     }
@@ -247,12 +263,40 @@ function HeaderHeart({
       className={`relative cursor-pointer transition-colors duration-300 ${textColor}`}
       style={{ willChange: "clip-path" }}
     >
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        ref={svgRef}
+        width="22" height="22" viewBox="0 0 24 24"
+        fill={justAdded ? "#E8192C" : "none"}
+        stroke={justAdded ? "#E8192C" : "currentColor"}
+        strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+        style={{ transition: "fill 0.2s ease, stroke 0.2s ease", display: "block" }}
+      >
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
       </svg>
-      {show && (
-        <span className="absolute -top-3 -right-2.5 text-[11px] font-bold text-[#E8192C] leading-none animate-zoom-in-fade">
-          +{count}
+
+      {count > 0 && (
+        <span
+          className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-[#E8192C] text-white text-[9px] font-bold flex items-center justify-center leading-none"
+          style={{ fontFamily: "var(--font-inter)" }}
+        >
+          {count}
+        </span>
+      )}
+
+      {particles.map((p) => (
+        <span
+          key={p}
+          className="absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-[#E8192C] pointer-events-none"
+          style={{ animation: `heartParticle${p} 0.8s ease-out forwards` }}
+        />
+      ))}
+
+      {justAdded && (
+        <span
+          className="absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-bold text-[#E8192C] whitespace-nowrap pointer-events-none"
+          style={{ animation: "floatUp 0.8s ease-out forwards", fontFamily: "var(--font-inter)" }}
+        >
+          +1 ♡
         </span>
       )}
     </button>
@@ -272,13 +316,38 @@ function HeaderBag({
   count: number;
   onClick: () => void;
 }) {
-  const [show, setShow] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
+  const [particles, setParticles] = useState<number[]>([]);
   const prevCount = useRef(count);
+  const svgRef = useRef<SVGSVGElement>(null);
+  const wrapRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (count > prevCount.current) {
-      setShow(true);
-      const t = setTimeout(() => setShow(false), 1200);
+      setJustAdded(true);
+      setParticles([1, 2, 3, 4]);
+
+      if (svgRef.current) {
+        gsap.timeline()
+          .to(svgRef.current, { rotate: -15, scale: 1.3, duration: 0.12, ease: "power2.out" })
+          .to(svgRef.current, { rotate: 12, scale: 1.1, duration: 0.1, ease: "power2.out" })
+          .to(svgRef.current, { rotate: -8, duration: 0.08 })
+          .to(svgRef.current, { rotate: 0, scale: 1, duration: 0.25, ease: "power3.out" });
+      }
+
+      if (wrapRef.current) {
+        gsap.fromTo(wrapRef.current,
+          { outline: "0px solid rgba(0,0,0,0)", outlineOffset: "0px" },
+          { outlineOffset: "6px", duration: 0.4, ease: "power2.out",
+            onComplete: () => { if (wrapRef.current) wrapRef.current.style.outline = "none"; }
+          }
+        );
+      }
+
+      const t = setTimeout(() => {
+        setJustAdded(false);
+        setParticles([]);
+      }, 900);
       prevCount.current = count;
       return () => clearTimeout(t);
     }
@@ -287,20 +356,50 @@ function HeaderBag({
 
   return (
     <button
-      ref={iconRef}
+      ref={(el) => {
+        (iconRef as React.MutableRefObject<HTMLButtonElement | null>).current = el;
+        (wrapRef as React.MutableRefObject<HTMLButtonElement | null>).current = el;
+      }}
       aria-label="Shopping Bag"
       onClick={onClick}
       className={`relative cursor-pointer transition-colors duration-300 ${textColor}`}
       style={{ willChange: "clip-path" }}
     >
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        ref={svgRef}
+        width="22" height="22" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor"
+        strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+        style={{ display: "block" }}
+      >
         <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
         <path d="M3 6h18" />
         <path d="M16 10a4 4 0 0 1-8 0" />
       </svg>
-      {show && (
-        <span className="absolute -top-3 -right-2.5 text-[11px] font-bold text-[#E8192C] leading-none animate-zoom-in-fade">
-          +{count}
+
+      {count > 0 && (
+        <span
+          className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-black text-white text-[9px] font-bold flex items-center justify-center leading-none"
+          style={{ fontFamily: "var(--font-inter)", background: "#E8192C", transition: "background 0.3s ease" }}
+        >
+          {count}
+        </span>
+      )}
+
+      {particles.map((p) => (
+        <span
+          key={p}
+          className="absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full pointer-events-none"
+          style={{  background: "#E8192C", animation: `bagParticle${p} 0.7s ease-out forwards` }}
+        />
+      ))}
+
+      {justAdded && (
+        <span
+          className="absolute -top-5 left-1/2 -translate-x-1/2 text-[11px] font-bold text-black whitespace-nowrap pointer-events-none"
+          style={{ animation: "floatUp 0.8s ease-out forwards", fontFamily: "var(--font-inter)" }}
+        >
+          +1
         </span>
       )}
     </button>
@@ -317,9 +416,12 @@ export default function Header() {
   const wishlistCtx = useContext(WishlistContext);
   const cartCtx      = useContext(CartContext);
 
-  const forceDark = pathname !== "/";
+  const forceDark     = pathname !== "/";
+  // الهيدر يختفي/يظهر بالـ scroll بس في صفحة المنتج
+  const hideOnScroll  = pathname.startsWith("/product/");
 
-  const { headerRef, brandRef, icon1Ref, icon2Ref, headerClass, textColor } = useHeader(40, forceDark);
+  const { headerRef, brandRef, icon1Ref, icon2Ref, headerClass, textColor } =
+    useHeader(40, forceDark, hideOnScroll);
 
   return (
     <>

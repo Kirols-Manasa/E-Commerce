@@ -77,7 +77,10 @@ export function useCart() {
 
 function HeartButton({ product }: { product: Product }) {
   const { add, remove, has } = useWishlist();
-  const svgRef  = useRef<SVGSVGElement | null>(null);
+  const svgRef    = useRef<SVGSVGElement | null>(null);
+  const timerRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // flashing = تأثير مؤقت بس مش saved
+  const [flashing, setFlashing] = useState(false);
   const isSaved = has(product.id);
 
   const toggle = (e: React.MouseEvent) => {
@@ -86,10 +89,29 @@ function HeartButton({ product }: { product: Product }) {
     if (isSaved) {
       remove(product.id);
     } else {
-      add({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice, image: product.image });
+      add({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice,
+        image: product.image,
+      });
+      // شغّل تأثير الـ bounce
       if (svgRef.current) animateHeartAdd(svgRef.current);
+      // فلاش أحمر مؤقت لمدة 700ms بس ميبقاش محفوظ بلون أحمر في الكارت
+      setFlashing(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setFlashing(false), 600);
     }
   };
+
+  // cleanup عند unmount
+  useEffect(() => {
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, []);
+
+  // لون القلب: لو flashing يبقى أحمر مؤقت، لو saved يبقى أحمر دايم، غير كده شفاف
+  const isRed = flashing  
 
   return (
     <button
@@ -109,10 +131,10 @@ function HeartButton({ product }: { product: Product }) {
       <svg
         ref={svgRef}
         width="18" height="18" viewBox="0 0 24 24"
-        fill={isSaved ? "#E8192C" : "none"}
-        stroke={isSaved ? "#E8192C" : "#111111"}
+        fill={isRed ? "#E8192C" : "none"}
+        stroke={isRed ? "#E8192C" : "#111111"}
         strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-        style={{ transition: "fill 0.3s ease, stroke 0.3s ease", display: "block" }}
+        style={{ transition: "fill 0.25s ease, stroke 0.25s ease", display: "block" }}
       >
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
       </svg>
@@ -123,13 +145,41 @@ function HeartButton({ product }: { product: Product }) {
 // ─── Product Card ─────────────────────────────────────────────────────────────
 
 export function ProductCard({ product }: { product: Product }) {
-  const cardRef = useRef<HTMLAnchorElement | null>(null);
+  const cardRef   = useRef<HTMLAnchorElement | null>(null);
+  const imageRef  = useRef<HTMLDivElement | null>(null);
+
+  // Zoom بسيط على الصورة عند hover
+  useEffect(() => {
+    const card  = cardRef.current;
+    const imgEl = imageRef.current;
+    if (!card || !imgEl) return;
+
+    const img = imgEl.querySelector("img") as HTMLImageElement | null;
+    if (!img) return;
+
+    img.style.transition = "transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94)";
+    img.style.willChange = "transform";
+
+    const onEnter = () => { img.style.transform = "scale(1.06)"; };
+    const onLeave = () => { img.style.transform = "scale(1)"; };
+
+    card.addEventListener("mouseenter", onEnter);
+    card.addEventListener("mouseleave", onLeave);
+
+    return () => {
+      card.removeEventListener("mouseenter", onEnter);
+      card.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  // الـ GSAP card hover (اللي كان موجود الأول)
   useCardHover(cardRef.current);
+
   const objectFit = product.fit === "contain" ? "object-contain p-4" : "object-cover";
 
   return (
     <Link ref={cardRef} href={`/product/${product.id}`} className="shop-card group relative block cursor-pointer">
-      <div className="relative overflow-hidden bg-[#F5F4F2] aspect-[3/4]">
+      <div ref={imageRef} className="relative overflow-hidden bg-[#F5F4F2] aspect-[3/4]">
         <Image
           src={product.image} alt={product.name} fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
@@ -176,7 +226,6 @@ export default function ShopSection() {
     animateSwitch();
     setTimeout(() => {
       setActiveCategory(cat);
-      // بعد ما React يعمل re-render، شغّل enter animation
       requestAnimationFrame(() => requestAnimationFrame(() => animateEnter()));
     }, 240);
   }, [activeCategory, animateSwitch, animateEnter]);
