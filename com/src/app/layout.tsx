@@ -47,7 +47,7 @@ export const metadata: Metadata = {
       "Discover AURA — a curated collection of premium men's and women's fashion, accessories, and footwear. Refined essentials for those who dress with intention.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/favicon.ico",
         width: 1200,
         height: 630,
         alt: "AURA — Elevated Fashion",
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
     title: "AURA — Elevated Fashion",
     description:
       "Discover AURA — a curated collection of premium men's and women's fashion, accessories, and footwear.",
-    images: ["/og-image.jpg"],
+    images: ["/favicon.ico"],
     creator: "@KirolsManasa",
   },
 
@@ -110,7 +110,7 @@ export default function RootLayout({
     description:
       "A curated collection of premium men's and women's fashion, accessories, and footwear.",
     url: "https://aura-store-vert.vercel.app",
-    logo: "https://aura-store-vert.vercel.app/og-image.jpg",
+    logo: "https://aura-store-vert.vercel.app/favicon.ico",
     sameAs: [
       "https://twitter.com/KirolsManasa",
     ],
