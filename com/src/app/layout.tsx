@@ -21,6 +21,12 @@ export const metadata: Metadata = {
   creator: "Kirols Manasa",
   publisher: "AURA",
 
+  metadataBase: new URL("https://aura-store-vert.vercel.app"),
+
+  verification: {
+    google: "6gbMHsyf9v0uC5eznZfuwomHsuDLYWiTj8nMCK6-GAE",
+  },
+
   robots: {
     index: true,
     follow: true,
@@ -41,9 +47,9 @@ export const metadata: Metadata = {
       "Discover AURA — a curated collection of premium men's and women's fashion, accessories, and footwear. Refined essentials for those who dress with intention.",
     images: [
       {
-        url: "/favicon.ico",
-        width: 32,
-        height: 32,
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
         alt: "AURA — Elevated Fashion",
       },
     ],
@@ -54,7 +60,7 @@ export const metadata: Metadata = {
     title: "AURA — Elevated Fashion",
     description:
       "Discover AURA — a curated collection of premium men's and women's fashion, accessories, and footwear.",
-    images: ["/favicon.ico"],
+    images: ["/og-image.jpg"],
     creator: "@KirolsManasa",
   },
 
@@ -69,12 +75,12 @@ export const metadata: Metadata = {
     "AURA",
     "fashion",
     "luxury fashion",
-    "men fashion",
-    "women fashion",
-    "accessories",
-    "shoes",
-    "premium clothing",
+    "men's fashion",
+    "women's fashion",
+    "designer accessories",
+    "premium shoes",
     "elevated style",
+    "refined clothing",
   ],
 };
 
@@ -97,8 +103,28 @@ const inter = Inter({
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    name: "AURA",
+    description:
+      "A curated collection of premium men's and women's fashion, accessories, and footwear.",
+    url: "https://aura-store-vert.vercel.app",
+    logo: "https://aura-store-vert.vercel.app/og-image.jpg",
+    sameAs: [
+      "https://twitter.com/KirolsManasa",
+    ],
+    priceRange: "$$",
+  };
+
   return (
     <html lang="en" dir="ltr" className={`${playfairDisplay.variable} ${inter.variable}`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body className="font-[family-name:var(--font-inter)]">
         <TRPCReactProvider>
           <WishlistProvider>
