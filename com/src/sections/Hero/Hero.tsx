@@ -48,7 +48,7 @@ export default function Hero() {
           priority
           className="object-cover object-[75%_top]"
         />
-        <div className="absolute inset-0 bg-black/15" />
+        <div className="absolute inset-0 bg-black/20" />
       </div>
 
       <Container className="relative z-10 h-full flex items-center">
